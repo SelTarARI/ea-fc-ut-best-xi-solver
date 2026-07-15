@@ -1,6 +1,6 @@
-# FC 26 Best XI Solver
+# EA FC UT Best XI Solver
 
-Find the **provably optimal starting XI** for your EA Sports FC 26 Ultimate Team — for a single formation, or ranked across all 29 in-game formations at once.
+Find the **provably optimal starting XI** for your EA Sports FC Ultimate Team — for a single formation, or ranked across all 29 in-game formations at once.
 
 Most squad tools pick players greedily (best striker first, then best winger, ...), which silently loses points whenever a player could fill more than one position. This solver treats team selection as what it mathematically is — an [assignment problem](https://en.wikipedia.org/wiki/Assignment_problem) — and solves it with the Hungarian algorithm, so the XI it returns is guaranteed to have the maximum possible total rating. If your best CAM is also your only good striker, the solver figures out where he earns you more points overall.
 
