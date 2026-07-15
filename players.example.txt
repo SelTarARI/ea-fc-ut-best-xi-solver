@@ -3,6 +3,7 @@
 
 Pele, 93: CAM
 Wright, 93: ST LM LW
+Abdelmaguid, 92: CB
 Appollis, 92: LW LM
 Provod, 92: CAM CM LM
 Kolasinac, 92: CB
@@ -15,12 +16,3 @@ Dempsey, 89: CAM ST LW
 Nakata, 89: CAM CM
 Chavez, 89: LB LM
 Davies, 89: LB LM
-Gabriel, 88: CB
-Quinones, 87: ST LM LW
-Kewell, 87: LW LM CAM
-Park, 87: CAM RM CM LM
-Sorloth, 86: ST RM RW
-Llorente, 86: RB RM CM
-Messi, 86: RW RM CAM ST
-Pina, 86: LW LM ST
-Calhanoglu, 86: CDM CM
