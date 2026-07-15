@@ -14,5 +14,7 @@ David, 90: ST
 Cahill, 89: ST CM CAM
 Dempsey, 89: CAM ST LW
 Nakata, 89: CAM CM
+Dempsey, 89: CAM ST LW
+Nakata, 89: CAM CM
 Chavez, 89: LB LM
 Davies, 89: LB LM
