@@ -3,18 +3,19 @@
 
 Pele, 93: CAM
 Wright, 93: ST LM LW
-Abdelmaguid, 92: CB
 Appollis, 92: LW LM
 Provod, 92: CAM CM LM
 Kolasinac, 92: CB
 McKennie, 92: RM CDM CM CAM
+Abdelmaguid, 92: CB
+Etienne Jr., 92: LM ST LW
+Cordoba, 92: CB
+Afif, 92: LM CAM ST LW
+Khamrobekov, 92: CDM CB CM
+Sosa, 92: LM RM LW
+Preciado, 92: RM RB RW
+Freuler, 92: CDM CM
+Caleta-Car, 92: CB
+Bardakci, 92: CB LB LM
+Bernhardsson, 92: ST RM CAM RW
 Kahn, 91: GK
-Ashurmatov, 91: CB RB CDM
-David, 90: ST
-Cahill, 89: ST CM CAM
-Dempsey, 89: CAM ST LW
-Nakata, 89: CAM CM
-Dempsey, 89: CAM ST LW
-Nakata, 89: CAM CM
-Chavez, 89: LB LM
-Davies, 89: LB LM
