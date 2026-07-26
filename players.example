@@ -1,5 +1,5 @@
 # FC 26 Best XI Solver — example squad
-# Format: one player per line ->  Name, rating: POS POS   (name optional)
+# Format: one player per line ->  [Name,] rating[*]: POS [POS ...]
 
 Pele, 93: CAM
 Wright, 93: ST LM LW

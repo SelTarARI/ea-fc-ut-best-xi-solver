@@ -2,5 +2,4 @@ __pycache__/
 *.pyc
 out.txt
 *.json
-players.txt
-out.txt
+*.txt
