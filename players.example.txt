@@ -10,7 +10,7 @@ McKennie, 92: RM CDM CM CAM
 Abdelmaguid, 92: CB
 Etienne Jr., 92: LM ST LW
 Cordoba, 92: CB
-Afif, 92: LM CAM ST LW
+Afif, 92*: LM CAM ST LW
 Khamrobekov, 92: CDM CB CM
 Sosa, 92: LM RM LW
 Preciado, 92: RM RB RW

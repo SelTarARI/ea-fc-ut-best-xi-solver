@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-EA FC 26 Ultimate Team — Best XI solver.
+EA FC Ultimate Team — Best XI solver.
 
 Finds the optimal starting XI (maximum total rating) for one formation or
 ranks ALL 29 FC 26 Ultimate Team formations, using the Hungarian algorithm
 (optimal assignment, not greedy). Pure Python, no dependencies.
 
 Player file format (one player per line, '#' starts a comment).
+
+A '*' after the rating marks a mandatory player that must appear in the
+starting XI whenever the selected formation allows it.
 A name before a comma is optional -- no brackets, no quotes:
     91: GK
     Arda, 92: CAM CM
@@ -90,16 +93,20 @@ FORMATIONS = {
 # ---------------------------------------------------------------- player file
 
 class Player:
-    __slots__ = ("name", "rating", "positions", "idx")
+    __slots__ = ("name", "rating", "positions", "idx", "locked")
 
-    def __init__(self, name, rating, positions, idx):
+    def __init__(self, name, rating, positions, idx, locked=False):
         self.name = name
         self.rating = rating
         self.positions = positions
         self.idx = idx
+        self.locked = locked
 
     def label(self):
-        return f"{self.rating} {self.name}" if self.name else str(self.rating)
+        text = f"{self.rating} {self.name}" if self.name else str(self.rating)
+        if self.locked:
+            text += "*"
+        return text
 
 
 def parse_players(path):
@@ -123,7 +130,13 @@ def parse_players(path):
                     sys.exit(f"{path}:{lineno}: cannot parse '{raw.strip()}'")
                 rating_part, pos_part = parts
             try:
-                rating = int(rating_part.strip())
+                rating_text = rating_part.strip()
+
+                locked = rating_text.endswith("*")
+                if locked:
+                    rating_text = rating_text[:-1].strip()
+
+                rating = int(rating_text)
             except ValueError:
                 sys.exit(f"{path}:{lineno}: bad rating in '{raw.strip()}'")
             if not (1 <= rating <= 99):
@@ -134,7 +147,9 @@ def parse_players(path):
                 sys.exit(f"{path}:{lineno}: {e}")
             if not positions:
                 sys.exit(f"{path}:{lineno}: no positions given")
-            players.append(Player(name, rating, positions, len(players)))
+            players.append(
+                Player(name, rating, positions, len(players), locked)
+            )
     if not players:
         sys.exit(f"{path}: no players found")
     return players
@@ -194,32 +209,123 @@ def hungarian_min(cost):
 
 FORBIDDEN = 10 ** 6
 
-
 def best_xi(formation_rows, players):
-    """Optimal assignment of players to the formation's 11 slots.
-    Returns (total, assignment) where assignment[slot_index] = Player,
-    or (None, None) if the formation cannot be filled."""
+    """
+    Returns (total, assignment).
+
+    Players whose rating is followed by '*' are mandatory and must appear in
+    the XI. If they cannot all fit the formation, returns (None, None).
+    """
+
     slots = [pos for row in formation_rows for pos in row]
-    n, m = len(slots), len(players)
-    if m < n:
+
+    if len(players) < len(slots):
         return None, None
-    # maximization -> minimization; forbidden edges get a huge cost
-    cost = [
-        [
-            (100 - pl.rating) if slot in pl.positions else FORBIDDEN
-            for pl in players
-        ]
-        for slot in slots
+
+    mandatory = [p for p in players if p.locked]
+
+    if len(mandatory) > len(slots):
+        return None, None
+
+    ####################################################################
+    # Stage 1: assign mandatory players
+    ####################################################################
+
+    if mandatory:
+
+        cost = []
+
+        for pl in mandatory:
+            row = []
+            for slot in slots:
+                if slot in pl.positions:
+                    row.append(100 - pl.rating)
+                else:
+                    row.append(FORBIDDEN)
+            cost.append(row)
+
+        assign = hungarian_min(cost)
+
+        occupied_slots = set()
+        mandatory_assignment = {}
+
+        for player_index, slot_index in enumerate(assign):
+
+            if slot_index < 0:
+                return None, None
+
+            if cost[player_index][slot_index] >= FORBIDDEN:
+                return None, None
+
+            occupied_slots.add(slot_index)
+            mandatory_assignment[slot_index] = mandatory[player_index]
+
+    else:
+
+        occupied_slots = set()
+        mandatory_assignment = {}
+
+    ####################################################################
+    # Stage 2: fill remaining slots
+    ####################################################################
+
+    remaining_slots = [
+        (i, slots[i])
+        for i in range(len(slots))
+        if i not in occupied_slots
     ]
-    assign = hungarian_min(cost)
-    chosen = []
-    total = 0
-    for si, pj in enumerate(assign):
-        if pj < 0 or cost[si][pj] >= FORBIDDEN:
-            return None, None       # some slot only fillable by forbidden edge
-        chosen.append(players[pj])
-        total += players[pj].rating
-    return total, chosen
+
+    remaining_players = [
+        p
+        for p in players
+        if not p.locked
+    ]
+
+    xi = [None] * len(slots)
+
+    for slot_index, player in mandatory_assignment.items():
+        xi[slot_index] = player
+
+    if remaining_slots:
+
+        cost = []
+
+        for _, slot in remaining_slots:
+
+            row = []
+
+            for pl in remaining_players:
+
+                if slot in pl.positions:
+                    row.append(100 - pl.rating)
+                else:
+                    row.append(FORBIDDEN)
+
+            cost.append(row)
+
+        assign = hungarian_min(cost)
+
+        total = sum(p.rating for p in mandatory)
+
+        for row_index, player_index in enumerate(assign):
+
+            if player_index < 0:
+                return None, None
+
+            if cost[row_index][player_index] >= FORBIDDEN:
+                return None, None
+
+            original_slot = remaining_slots[row_index][0]
+            player = remaining_players[player_index]
+
+            xi[original_slot] = player
+            total += player.rating
+
+    else:
+
+        total = sum(p.rating for p in mandatory)
+
+    return total, xi
 
 
 # ---------------------------------------------------------------- output
@@ -263,6 +369,11 @@ def main():
     args = ap.parse_args()
 
     players = parse_players(args.players_file)
+
+    locked = sum(p.locked for p in players)
+    if locked > 11:
+        sys.exit(f"{locked} players are marked with '*', but only 11 can start.")
+
     print(f"Loaded {len(players)} players from {args.players_file}\n")
 
     if args.formation:
